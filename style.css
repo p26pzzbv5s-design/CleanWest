@@ -613,9 +613,29 @@
     text-align: center; padding: 40px;
     animation: popIn .5s var(--ease);
     }
+    .form-success[hidden] { display: none !important; }
     .form-success svg { width: 60px; height: 60px; color: var(--blue); }
     .form-success p { font-family: var(--font-display); font-size: 1.2rem; color: var(--navy); font-weight: 600; max-width: 40ch; }
     @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Close button inside form success */
+        .form-success-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid rgba(11,31,58,0.06);
+            color: var(--navy);
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .form-success-close:hover { background: var(--ice); }
 
     .booking-side { display: flex; flex-direction: column; gap: 22px; }
     .glass {

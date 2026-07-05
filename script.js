@@ -1,8 +1,13 @@
 (function () {
-  "use strict";
+    "use strict";
 
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const formatNumber = new Intl.NumberFormat("sv-SE");
+    emailjs.init({
+        publicKey: "Mb_SESwgoO6eyKrNQ",
+    });
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const formatNumber = new Intl.NumberFormat("sv-SE");
+
 
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
@@ -376,7 +381,13 @@
 
     if (!form || !success) return;
 
-    form.addEventListener("submit", (event) => {
+    // Ensure the success panel is hidden on initial load
+    try {
+      success.hidden = true;
+      if (success.hasAttribute && success.hasAttribute('tabindex')) success.removeAttribute('tabindex');
+    } catch (e) {}
+
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       if (!form.checkValidity()) {
@@ -411,8 +422,32 @@
         submitButton.setAttribute("aria-disabled", "true");
       }
 
-      // Keep data locally in console (no e-post address exposed)
-      try { console.info('Offertförfrågan (lokalt):', payload); } catch (e) {}
+      try {
+    await emailjs.send(
+        "service_sf0zfoo",
+        "template_rnh6784",
+        {
+            name: name,
+            phone: phone,
+            email: email,
+            address: address,
+            service: service,
+            area: area,
+            date: date,
+            message: message
+        }
+    );
+} catch (error) {
+    console.error(error);
+    alert("Kunde inte skicka offertförfrågan.");
+
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.removeAttribute("aria-disabled");
+    }
+
+    return;
+}
 
       window.setTimeout(
         () => {
@@ -438,6 +473,15 @@
         prefersReducedMotion ? 0 : 350
       );
     });
+
+    // Close button inside success panel
+    const closeBtn = $("#formSuccessClose");
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        try { success.hidden = true; success.removeAttribute && success.removeAttribute('tabindex'); } catch (e) {}
+        if (submitButton) submitButton.focus();
+      });
+    }
   }
 
   function initCalendar() {
